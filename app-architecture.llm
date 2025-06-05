@@ -1,0 +1,232 @@
+# Realtime API Agents Demo - App Architecture & Design
+
+## Project Overview
+The Realtime API Agents Demo is a Next.js TypeScript application that demonstrates advanced voice agent patterns using the OpenAI Realtime API and OpenAI Agents SDK. The application showcases two primary agentic patterns for building sophisticated voice-enabled AI applications.
+
+## Technology Stack
+- **Frontend**: Next.js 15.3.1 with React 19.0.0
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS 3.4.1
+- **AI Integration**: OpenAI Realtime API, OpenAI Agents SDK (@openai/agents)
+- **Audio**: WebRTC for real-time audio streaming
+- **Validation**: Zod for schema validation
+- **Icons**: Radix UI React Icons
+- **Utilities**: UUID for unique identifiers
+
+## Core Architecture Patterns
+
+### 1. Chat-Supervisor Pattern
+**Location**: `src/app/agentConfigs/chatSupervisor/`
+
+This pattern combines:
+- **Chat Agent** (gpt-4o-realtime-mini): Handles basic conversational tasks, greetings, and information collection
+- **Supervisor Agent** (gpt-4.1): Handles complex reasoning, tool calls, and high-intelligence responses
+
+**Key Benefits**:
+- Immediate response to users while maintaining high-quality answers
+- Cost-effective (uses mini model for simple tasks)
+- Easy migration path from existing text-based agents
+- Natural conversation flow with "thinking" transitions
+
+### 2. Sequential Handoff Pattern
+**Location**: `src/app/agentConfigs/customerServiceRetail/` & `src/app/agentConfigs/simpleHandoff.ts`
+
+This pattern implements:
+- **Specialized Agents**: Each agent handles specific domains (authentication, returns, sales, escalation)
+- **Agent Graph**: Explicit handoff relationships between agents
+- **State Management**: Tool-call driven agent transfers
+- **Session Updates**: Dynamic instruction and tool updates
+
+**Key Benefits**:
+- Domain expertise separation
+- Clear conversation flow management
+- Scalable agent architecture
+- Customer service optimization
+
+## Project Structure
+
+```
+src/app/
+├── agentConfigs/           # Agent configuration patterns
+│   ├── chatSupervisor/     # Chat-Supervisor pattern implementation
+│   │   ├── index.ts        # Main chat agent configuration
+│   │   ├── supervisorAgent.ts # Supervisor agent logic
+│   │   └── sampleData.ts   # Demo data
+│   ├── customerServiceRetail/ # Sequential handoff implementation
+│   │   ├── authentication.ts  # User authentication agent
+│   │   ├── returns.ts        # Returns processing agent
+│   │   ├── sales.ts          # Sales agent
+│   │   ├── simulatedHuman.ts # Human escalation agent
+│   │   └── index.ts          # Agent graph configuration
+│   ├── simpleHandoff.ts    # Basic handoff example
+│   ├── realtimeClient.ts   # WebRTC client wrapper
+│   ├── guardrails.ts       # Content moderation
+│   └── index.ts            # Agent configuration registry
+├── api/                    # Next.js API routes
+│   ├── session/            # Session management
+│   └── responses/          # Response handling
+├── components/             # React UI components
+│   ├── Transcript.tsx      # Conversation display
+│   ├── Events.tsx          # Event logging
+│   ├── BottomToolbar.tsx   # User controls
+│   └── GuardrailChip.tsx   # Moderation indicators
+├── contexts/               # React context providers
+├── hooks/                  # Custom React hooks
+├── lib/                    # Utility libraries
+├── App.tsx                 # Main application component
+├── types.ts                # TypeScript type definitions
+└── globals.css             # Global styles
+```
+
+## Key Components
+
+### 1. Main Application (`App.tsx`)
+- **Session Management**: Handles WebRTC connections to OpenAI Realtime API
+- **Agent Orchestration**: Manages agent selection and switching
+- **Audio Pipeline**: Controls audio input/output and recording
+- **Event Logging**: Comprehensive logging of client/server events
+- **Real-time Updates**: Manages transcript and conversation state
+
+### 2. Agent Configuration System
+- **Modular Design**: Each agent pattern is self-contained
+- **Dynamic Loading**: Agents are loaded based on URL parameters
+- **Tool Integration**: Extensible tool system with custom logic
+- **Transfer Mechanisms**: Built-in agent handoff capabilities
+
+### 3. Real-time Communication
+- **WebRTC Integration**: Direct audio streaming to OpenAI
+- **Event-Driven Architecture**: Bidirectional event streaming
+- **Session Management**: Ephemeral token-based authentication
+- **Error Handling**: Robust connection management
+
+### 4. User Interface
+- **Transcript View**: Real-time conversation display with expandable details
+- **Event Log**: Technical event inspection for debugging
+- **Control Panel**: Audio controls, agent selection, and connection management
+- **Responsive Design**: Mobile-friendly interface
+
+## Data Flow Architecture
+
+### 1. Session Initialization
+```
+User → Next.js Client → /api/session → OpenAI Realtime API → Ephemeral Token → WebRTC Connection
+```
+
+### 2. Voice Interaction Flow
+```
+User Audio → WebRTC → OpenAI Realtime API → Agent Processing → Response Generation → Audio Output
+```
+
+### 3. Agent Transfer Flow
+```
+Current Agent → Transfer Tool Call → Session Update → New Agent Instructions → Continue Conversation
+```
+
+### 4. Chat-Supervisor Flow
+```
+User Input → Chat Agent → [Decision] → Supervisor Agent → Tool Calls → Response → Chat Agent → User
+```
+
+## Security & Moderation
+
+### Content Guardrails
+- **Real-time Moderation**: Assistant messages are checked before display
+- **Category Classification**: OFFENSIVE, OFF_BRAND, VIOLENCE, NONE
+- **Status Tracking**: IN_PROGRESS, DONE, FAIL, PASS states
+- **User Feedback**: Visual indicators for moderation status
+
+### Authentication
+- **Ephemeral Tokens**: Short-lived session keys
+- **Environment Variables**: Secure API key management
+- **CORS Handling**: Proper cross-origin request management
+
+## State Management
+
+### 1. Transcript State
+- **Message Tracking**: User and assistant messages with timestamps
+- **Breadcrumb System**: Agent switches and tool call tracking
+- **Status Management**: In-progress vs completed states
+- **Expandable Details**: Full event payload inspection
+
+### 2. Session State
+- **Connection Status**: DISCONNECTED, CONNECTING, CONNECTED
+- **Agent Selection**: Current and available agents
+- **Audio Settings**: PTT, VAD, playback controls
+- **Event Logging**: Comprehensive client/server event tracking
+
+### 3. Agent State
+- **Configuration Loading**: Dynamic agent config selection
+- **Tool State**: Function call tracking and response handling
+- **Transfer State**: Handoff coordination between agents
+
+## Extensibility Features
+
+### 1. Custom Agent Creation
+- **Agent Config Interface**: Standardized agent definition
+- **Tool System**: Custom tool logic implementation
+- **Instruction Templates**: Voice-optimized prompt patterns
+- **Handoff Definitions**: Explicit agent relationship mapping
+
+### 2. Tool Integration
+- **Function Calling**: OpenAI function calling integration
+- **Custom Logic**: Server-side tool execution
+- **Response Handling**: Structured tool response processing
+- **Error Management**: Tool failure handling
+
+### 3. UI Customization
+- **Component Architecture**: Modular React components
+- **Theme System**: Tailwind CSS configuration
+- **Event Handling**: Extensible event logging
+- **Audio Controls**: Configurable audio pipeline
+
+## Performance Considerations
+
+### 1. Real-time Optimization
+- **WebRTC**: Low-latency audio streaming
+- **Event Streaming**: Efficient bidirectional communication
+- **State Updates**: Optimized React re-rendering
+- **Audio Buffering**: Smooth audio playback
+
+### 2. Cost Optimization
+- **Model Selection**: Strategic use of mini vs full models
+- **Session Management**: Efficient connection handling
+- **Caching**: Minimize redundant API calls
+- **Resource Cleanup**: Proper WebRTC connection disposal
+
+## Development Workflow
+
+### 1. Agent Development
+1. Create agent config in `agentConfigs/`
+2. Define instructions, tools, and handoffs
+3. Implement custom tool logic
+4. Register in `agentConfigs/index.ts`
+5. Test via scenario dropdown
+
+### 2. UI Development
+1. Create components in `components/`
+2. Use TypeScript for type safety
+3. Follow Tailwind CSS patterns
+4. Test with different agent scenarios
+
+### 3. API Development
+1. Create endpoints in `api/`
+2. Implement proper error handling
+3. Use Zod for validation
+4. Test with various agent configs
+
+## Deployment Architecture
+
+### Production Considerations
+- **Environment Variables**: Secure API key management
+- **Session Scaling**: Ephemeral token lifecycle
+- **Audio Quality**: Codec selection and optimization
+- **Error Monitoring**: Comprehensive logging and alerting
+- **Performance Monitoring**: Real-time metrics tracking
+
+### Infrastructure Requirements
+- **WebRTC Support**: Modern browser compatibility
+- **API Limits**: OpenAI rate limiting considerations
+- **Storage**: Minimal persistent storage needs
+- **CDN**: Static asset optimization
+
+This architecture provides a robust foundation for building sophisticated voice AI applications with multiple agent patterns, real-time communication, and extensible design patterns. 
